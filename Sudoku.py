@@ -8,7 +8,7 @@ Harshul Mehta
 Neek Panchal
 Adam Serrao
 """
-
+from Backtracking import backtracking
 #Classes
 
 class Queue:
@@ -94,6 +94,27 @@ constraints = Queue()
 
 
 #Functions
+def display_grid(grid):
+    
+    space = 0
+    for i in range(0,9):
+        
+        space2 = 0
+        for j in range(0,9):
+            if(grid[i][j] != None):
+                print(grid[i][j], end = " ")
+            else:
+                print("#", end = " ")
+            space2 += 1
+            if(space2 == 3):
+                print(" ",end="")
+                space2 = 0
+        space += 1
+        if(space == 3):
+            print()
+            space = 0
+        print()
+    return
 def display_board():
     
     space = 0
@@ -115,6 +136,18 @@ def display_board():
             space = 0
         print()
     return
+def change_dict_to_arr():
+    grid = [ [0] * 9 for _ in range(9)]
+    row,col = 0,0
+    for i in board:
+        for j in i:
+            if(board_dict[j].value != None):
+                #append to array
+                grid[row][col] = board_dict[j].value
+            col = col + 1
+        col = 0
+        row = row + 1
+    return grid
 
 def generate_board():
     #initializes a Board for iteration and the dixtionary for each cell
@@ -217,7 +250,7 @@ def AC3():
     for i in board_dict:
         
         if(board_dict[i].value == None):
-            return False
+            return change_dict_to_arr()
 
     return True
 
@@ -236,9 +269,10 @@ def revise(xi,xj):
     return revised
 
 
+
 #Main
 
-f = open("Input_Easy.txt",'r')
+f = open("Input_Hard.txt",'r')
 
 start_val = []
 
@@ -266,13 +300,25 @@ solved = AC3()
  
 #display board after AC-3
 print("---------------------------------------")
-if solved:
+if solved == True:
     print("Solution: ")
+    print()
+    display_board()
 else:
-    print("Falied to solve stopped at: ")
-print()
+    print("Failed to solve with AC-3")
+    print("Stopped at: ")
+    print()
+    display_board()
+    print("---------------------------------------")
+    algo = backtracking()
+    back_board = algo.process(solved)
+    print("Solved with Backtracking:")
+    print()
+    display_grid(back_board)
 
-display_board()
+
+
+
 
 
 
