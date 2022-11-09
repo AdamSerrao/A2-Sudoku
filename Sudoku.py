@@ -9,6 +9,8 @@ Neek Panchal
 Adam Serrao
 """
 from Backtracking import backtracking
+import matplotlib.pyplot as plt
+
 #Classes
 
 class Queue:
@@ -57,15 +59,12 @@ class Node:
 
         #Box Neighbors
 
-        box = find_box(letter,num)
-        let_low = letters.index(box[0][0])
-        let_high = letters.index(box[1][0])
-        num_low = int(box[0][1])
-        num_high = int(box[1][1])
-
-        for i in range(let_low,let_high+1):
-            for j in range(num_low,num_high+1):
-                value = letters[i]+str(j)
+        row = letters.index(letter)
+        col = num-1
+        
+        for j in range(row//3*3,row//3*3+3):
+            for k in range(col//3*3,col//3*3+3):
+                value = letters[j]+str(k+1)
                 if(value not in self.neighbors and value != loc):
                     self.neighbors.append(value)
         return
@@ -91,6 +90,8 @@ board_dict = {}
 letters = ['A','B','C','D','E','F','G','H','I']
 size = 9
 constraints = Queue()
+step = []
+length = []
 
 
 #Functions
@@ -115,6 +116,7 @@ def display_grid(grid):
             space = 0
         print()
     return
+
 def display_board():
     
     space = 0
@@ -136,6 +138,7 @@ def display_board():
             space = 0
         print()
     return
+
 def change_dict_to_arr():
     grid = [ [0] * 9 for _ in range(9)]
     row,col = 0,0
@@ -165,7 +168,7 @@ def generate_board():
 
     return board
 
-def find_box(letter,num):
+
     #A function that return the range of each box
     if(letter < 'D'):
         if(num < 4):
@@ -204,16 +207,12 @@ def constraint_generator(cell, board):
                 if((cell,j) not in constraints and (j,cell) not in constraints and cell != j):
                     constraints.insert((cell,j))
     #Box Constraints
-    #uses find_box to determine which box to check(get the range of the box) 
-    box = find_box(letter,num)
-    let_low = letters.index(box[0][0])
-    let_high = letters.index(box[1][0])
-    num_low = int(box[0][1])
-    num_high = int(box[1][1])
-
-    for i in range(let_low,let_high+1):
-        for j in range(num_low,num_high+1):
-            value = letters[i]+str(j)
+    row = letters.index(letter)
+    col = num-1
+    
+    for i in range(row//3*3,row//3*3+3):
+        for j in range(col//3*3,col//3*3+3):
+            value = letters[i]+str(j+1)
             if((cell,value) not in constraints and (value,cell) not in constraints and cell != value):
                 constraints.insert((cell,value))
     return
@@ -227,8 +226,11 @@ def initialize_board(input_values):
 
 def AC3():
     queue = constraints
+    count = 0
 
     while queue.size() > 0:
+        step.append(count)
+        length.append(queue.size())
         arc = queue.remove()
         #Take values from arc 
         xi = board_dict[arc[0]]
@@ -246,12 +248,11 @@ def AC3():
 
                     if( (arc[0],xk) not in queue):
                         queue.insert((arc[0],xk))
+        count+=1
     #Checks that the board is solved
     for i in board_dict:
-        
         if(board_dict[i].value == None):
-            return change_dict_to_arr()
-
+            return False
     return True
 
 def revise(xi,xj):
@@ -264,15 +265,37 @@ def revise(xi,xj):
         if(not valid):
             xi.shrink_domain(x)
             revised = True
-        #print(xi.domain)
-
     return revised
 
+def is_valid(board):
+    for i in board_dict:
+        letter = i[0]
+        num = int(i[1])
+        if(board_dict[i].value != None):
+            for j in board:
+                for k in j:
+                    if(k[0] == letter and board_dict[k].value != None and board_dict[k].value == board_dict[i].value and k != i):
+                        print("Invalid Sudoku: Row {} has the same value at {} and {}".format(letter,i,k))
+                        return False
+                    elif (k[1] == num and board_dict[k].value != None and board_dict[k].value == board_dict[i].value and k != i):
+                        print("Invalid Sudoku: Column {} has the same value at {} and {}".format(num,i,k))
+                        return False
+        
+        row = letters.index(letter)
+        col = num-1
+        
+        for j in range(row//3*3,row//3*3+3):
+            for k in range(col//3*3,col//3*3+3):
+                cell = letters[j]+str(k+1)
+                if(board_dict[cell].value != None and board_dict[cell].value == board_dict[i].value and cell != i):
+                        print("Invalid Sudoku: Box constraint violated the same value at {} and {}".format(i,cell))
+                        return False
 
+    return True
 
 #Main
 
-f = open("Input_Hard.txt",'r')
+f = open("Input_VeryHard.txt",'r')
 
 start_val = []
 
@@ -292,34 +315,39 @@ for i in board:
 #fill board with values from file
 initialize_board(start_val)
 
-#display board before AC-3
-print("Initial Board: ")
-display_board()
+if(is_valid(board)):
 
-solved = AC3()
- 
-#display board after AC-3
-print("---------------------------------------")
-if solved == True:
-    print("Solution: ")
-    print()
+    #display board before AC-3
+    print("Initial Board: ")
     display_board()
-else:
-    print("Failed to solve with AC-3")
-    print("Stopped at: ")
-    print()
-    display_board()
+
+    solved = AC3()
+    
+    #display board after AC-3
     print("---------------------------------------")
-    algo = backtracking()
-    back_board = algo.process(solved)
-    print("Solved with Backtracking:")
-    print()
-    display_grid(back_board)
+    if solved == True:
+        print("Solution: ")
+        print()
+        display_board()
+    else:
+        print("Failed to solve with AC-3")
+        print("Stopped at: ")
+        print()
+        display_board()
+        print()
 
+        print("---------------------------------------")
+        
+        grid = change_dict_to_arr()
+        algo = backtracking()
+        back_board = algo.process(grid)
+        print("Solved with Backtracking:")
+        print()
+        display_grid(back_board)
 
-
-
-
-
-
-
+        plt.title("AC-3 Queue length")
+        plt.plot(step,length)
+        plt.xlabel('Step')
+        plt.ylabel('Length')
+        plt.draw()
+        plt.show()
