@@ -50,7 +50,7 @@ class backtracking:
             return self.process(sudoku_grid, row, col+1)
         else:
             range_val = self.board_grid[self.board[row][col]]
-            for item in range_val.domain: #check for each element 1 - 9
+            for item in range_val.domain: #check for each element in the domain result of AC-3
                 if self.isValid(sudoku_grid, row, col, item): 
                     #if valid then save value and proceed to solve subsequent squares
                     sudoku_grid[row][col] = item
