@@ -1,4 +1,18 @@
 class backtracking:
+    board_grid = {}
+    board = []
+    '''
+    constructor which initializes the board range which AC-3 solved 
+
+    input: board_grid dictionary with the results of AC-3, board is
+    the locations of each tile
+
+    output: none
+    '''
+    def __init__(self, board_grid, board) -> None:
+        self.board_grid = board_grid
+        self.board = board
+        pass
     """
     checking the validity of the item which is to be inserted 
     in said position.
@@ -35,7 +49,8 @@ class backtracking:
         elif sudoku_grid[row][col] != 0:
             return self.process(sudoku_grid, row, col+1)
         else:
-            for item in range(1,10): #check for each element 1 - 9
+            range_val = self.board_grid[self.board[row][col]]
+            for item in range_val.domain: #check for each element 1 - 9
                 if self.isValid(sudoku_grid, row, col, item): 
                     #if valid then save value and proceed to solve subsequent squares
                     sudoku_grid[row][col] = item

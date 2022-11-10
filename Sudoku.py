@@ -339,8 +339,8 @@ if(is_valid(board)):
         print("---------------------------------------")
         
         grid = change_dict_to_arr()
-        algo = backtracking()
-        back_board = algo.process(grid)
+        algo = backtracking(board_dict, board) #initialize the results of AC-3 for back tracking
+        back_board = algo.process(grid) #solve using the results of AC-3
         print("Solved with Backtracking:")
         print()
         display_grid(back_board)
